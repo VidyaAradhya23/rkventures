@@ -1,6 +1,174 @@
 document.addEventListener('DOMContentLoaded', () => {
   
   // ==========================================
+  // SIGNATURE SPLIT HERO HOVER LOGIC
+  // ==========================================
+  const heroSplit = document.querySelector('.hero-split');
+  const panelLeft = document.querySelector('.hero-split-left');
+  const panelRight = document.querySelector('.hero-split-right');
+
+  if (heroSplit && panelLeft && panelRight) {
+    panelLeft.addEventListener('mouseenter', () => {
+      heroSplit.classList.add('hover-left');
+      heroSplit.classList.remove('hover-right');
+    });
+    panelLeft.addEventListener('mouseleave', () => {
+      heroSplit.classList.remove('hover-left');
+    });
+
+    panelRight.addEventListener('mouseenter', () => {
+      heroSplit.classList.add('hover-right');
+      heroSplit.classList.remove('hover-left');
+    });
+    panelRight.addEventListener('mouseleave', () => {
+      heroSplit.classList.remove('hover-right');
+    });
+  }
+
+  // ==========================================
+  // PULSING TEAL CIRCUITS CANVAS ANIMATION
+  // ==========================================
+  const canvas = document.getElementById('circuitCanvas');
+  if (canvas) {
+    const ctx = canvas.getContext('2d');
+    let width = (canvas.width = panelLeft.offsetWidth);
+    let height = (canvas.height = panelLeft.offsetHeight);
+
+    // Track panel size on window resize
+    window.addEventListener('resize', () => {
+      if (panelLeft) {
+        width = canvas.width = panelLeft.offsetWidth;
+        height = canvas.height = panelLeft.offsetHeight;
+      }
+    });
+
+    // Define circuit points and pathways
+    const nodes = [];
+    const nodeCount = 15;
+    const paths = [];
+
+    // Initialize nodes
+    for (let i = 0; i < nodeCount; i++) {
+      nodes.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        radius: Math.random() * 3 + 2,
+        pulseVal: Math.random() * Math.PI,
+        pulseSpeed: Math.random() * 0.02 + 0.01,
+        color: 'rgba(0, 212, 180, ' + (Math.random() * 0.4 + 0.3) + ')'
+      });
+    }
+
+    // Connect nodes with orthogonal pathways (circuits style)
+    for (let i = 0; i < nodes.length; i++) {
+      const targetCount = Math.floor(Math.random() * 2) + 1;
+      for (let t = 0; t < targetCount; t++) {
+        const targetIdx = Math.floor(Math.random() * nodes.length);
+        if (targetIdx !== i) {
+          paths.push({
+            start: nodes[i],
+            end: nodes[targetIdx],
+            progress: Math.random(),
+            speed: Math.random() * 0.005 + 0.002
+          });
+        }
+      }
+    }
+
+    // Draw and animate
+    function animate() {
+      ctx.clearRect(0, 0, width, height);
+
+      // Draw background grid lines (subtle teal)
+      ctx.strokeStyle = 'rgba(0, 212, 180, 0.02)';
+      ctx.lineWidth = 1;
+      const gridSize = 40;
+      for (let x = 0; x < width; x += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+      }
+      for (let y = 0; y < height; y += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+      }
+
+      // Draw orthogonal connections (circuit tracks)
+      ctx.lineWidth = 1.5;
+      paths.forEach(p => {
+        ctx.strokeStyle = 'rgba(0, 212, 180, 0.06)';
+        ctx.beginPath();
+        ctx.moveTo(p.start.x, p.start.y);
+        
+        // Orthogonal corner point (circuit board look)
+        const midX = p.start.x + (p.end.x - p.start.x) / 2;
+        ctx.lineTo(midX, p.start.y);
+        ctx.lineTo(midX, p.end.y);
+        ctx.lineTo(p.end.x, p.end.y);
+        ctx.stroke();
+
+        // Animate light pulses along tracks
+        p.progress += p.speed;
+        if (p.progress > 1) {
+          p.progress = 0;
+          p.speed = Math.random() * 0.005 + 0.002;
+        }
+
+        // Draw glowing pulse dot
+        let currentX, currentY;
+        const totalLength = Math.abs(midX - p.start.x) + Math.abs(p.end.y - p.start.y) + Math.abs(p.end.x - midX);
+        const segment1 = Math.abs(midX - p.start.x) / totalLength;
+        const segment2 = segment1 + Math.abs(p.end.y - p.start.y) / totalLength;
+
+        if (p.progress < segment1) {
+          const t = p.progress / segment1;
+          currentX = p.start.x + (midX - p.start.x) * t;
+          currentY = p.start.y;
+        } else if (p.progress < segment2) {
+          const t = (p.progress - segment1) / (segment2 - segment1);
+          currentX = midX;
+          currentY = p.start.y + (p.end.y - p.start.y) * t;
+        } else {
+          const t = (p.progress - segment2) / (1 - segment2);
+          currentX = midX + (p.end.x - midX) * t;
+          currentY = p.end.y;
+        }
+
+        ctx.fillStyle = 'rgba(0, 212, 180, 0.8)';
+        ctx.shadowColor = 'rgba(0, 212, 180, 0.8)';
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+        ctx.arc(currentX, currentY, 3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0; // reset shadow
+      });
+
+      // Draw and animate nodes
+      nodes.forEach(n => {
+        n.pulseVal += n.pulseSpeed;
+        const glow = Math.sin(n.pulseVal) * 3 + n.radius;
+        
+        ctx.fillStyle = n.color;
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, glow, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Center solid core
+        ctx.fillStyle = '#00D4B4';
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, n.radius * 0.6, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      requestAnimationFrame(animate);
+    }
+    animate();
+  }
+
+  // ==========================================
   // NAVIGATION & MOBILE MENU
   // ==========================================
   const header = document.querySelector('.header');
@@ -25,7 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Close Mobile Menu on Link Click
+  // Close Mobile Menu & handle smooth scrolling highlight
   navLinks.forEach(link => {
     link.addEventListener('click', () => {
       if (hamburger && hamburger.classList.contains('active')) {
@@ -35,19 +203,31 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // ==========================================
-  // DYNAMIC ACTIVE NAV LINK BY PAGE
-  // ==========================================
-  const currentPath = window.location.pathname;
-  const pageName = currentPath.split("/").pop() || 'index.html';
-  
-  navLinks.forEach(link => {
-    const linkPath = link.getAttribute('href');
-    if (linkPath === pageName) {
-      link.classList.add('active');
-    } else {
+  // Active section high-lighting on scroll
+  const sections = document.querySelectorAll('section[id]');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    const scrollPos = window.scrollY + 100;
+
+    sections.forEach(section => {
+      const sectionTop = section.offsetTop;
+      const sectionHeight = section.offsetHeight;
+      if (scrollPos >= sectionTop && scrollPos < sectionTop + sectionHeight) {
+        current = section.getAttribute('id');
+      }
+    });
+
+    navLinks.forEach(link => {
       link.classList.remove('active');
-    }
+      const hrefAttr = link.getAttribute('href');
+      if (hrefAttr.includes(current) && current !== '') {
+        link.classList.add('active');
+      }
+      // If we are at the top, highlight home
+      if (window.scrollY < 200 && hrefAttr === '#home') {
+        link.classList.add('active');
+      }
+    });
   });
 
   // ==========================================
@@ -60,7 +240,6 @@ document.addEventListener('DOMContentLoaded', () => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           entry.target.classList.add('active');
-          // Once animated, no need to track it anymore
           observer.unobserve(entry.target);
         }
       });
@@ -71,7 +250,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     revealElements.forEach(el => revealObserver.observe(el));
   } else {
-    // Fallback if IntersectionObserver is not supported
     revealElements.forEach(el => el.classList.add('active'));
   }
 
@@ -87,7 +265,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const slideCount = slides.length;
     let autoPlayTimer;
 
-    // Create Dots dynamically
     indicatorContainer.innerHTML = '';
     for (let i = 0; i < slideCount; i++) {
       const dot = document.createElement('div');
@@ -127,12 +304,11 @@ document.addEventListener('DOMContentLoaded', () => {
       startAutoPlay();
     }
 
-    // Initialize
     startAutoPlay();
   }
 
   // ==========================================
-  // ENERGY PAGE: SPECIFICATION TABLES TOGGLE
+  // ENERGY SPECIFICATION TABLES TOGGLE
   // ==========================================
   const specBtns = document.querySelectorAll('.product-spec-btn');
   specBtns.forEach(btn => {
@@ -151,7 +327,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ==========================================
-  // CONSTRUCTION PAGE: GALLERY FILTERING
+  // CONSTRUCTION PORTFOLIO GALLERY FILTERING
   // ==========================================
   const filterBtns = document.querySelectorAll('.filter-btn');
   const galleryItems = document.querySelectorAll('.gallery-item');
@@ -159,7 +335,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (filterBtns.length > 0 && galleryItems.length > 0) {
     filterBtns.forEach(btn => {
       btn.addEventListener('click', () => {
-        // Toggle Active Class
         filterBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
 
@@ -169,19 +344,17 @@ document.addEventListener('DOMContentLoaded', () => {
           const itemCategory = item.getAttribute('data-category');
           
           if (filterValue === 'all' || itemCategory === filterValue) {
-            // Show Item
             item.style.display = 'block';
             setTimeout(() => {
               item.style.opacity = '1';
               item.style.transform = 'scale(1)';
             }, 50);
           } else {
-            // Hide Item
             item.style.opacity = '0';
             item.style.transform = 'scale(0.8)';
             setTimeout(() => {
               item.style.display = 'none';
-            }, 400); // match transition speed
+            }, 400);
           }
         });
       });
@@ -198,7 +371,6 @@ document.addEventListener('DOMContentLoaded', () => {
     enquiryForm.addEventListener('submit', (e) => {
       e.preventDefault();
 
-      // Retrieve form values
       const name = document.getElementById('name').value.trim();
       const phone = document.getElementById('phone').value.trim();
       const email = document.getElementById('email').value.trim();
@@ -206,58 +378,62 @@ document.addEventListener('DOMContentLoaded', () => {
       const divisionName = divisionSelect ? divisionSelect.options[divisionSelect.selectedIndex].text : 'General Enquiry';
       const details = document.getElementById('details').value.trim();
 
-      // Simple Validation check
       if (!name || !phone || !email) {
         alert('Please fill out all required fields.');
         return;
       }
 
-      // Show animated success overlay
       if (formSuccess) {
         formSuccess.classList.add('active');
         
-        // Auto-close success overlay after 6 seconds
         setTimeout(() => {
           formSuccess.classList.remove('active');
           enquiryForm.reset();
         }, 6000);
       }
 
-      // Optional: Generate WhatsApp Redirect URL
-      const whatsappBase = "https://wa.me/919876543210"; // Placeholder RK Ventures phone number
+      // Format custom message for WhatsApp redirect
+      const whatsappBase = "https://wa.me/919876543210";
       const formattedMessage = `Hello RK Ventures,\n\nI have submitted an enquiry on your website.\n\n*Name:* ${name}\n*Phone:* ${phone}\n*Email:* ${email}\n*Division:* ${divisionName}\n*Requirements:* ${details}`;
       const encodedMsg = encodeURIComponent(formattedMessage);
       
-      console.log("Form submitted. Mock sending details...");
-      console.log(formattedMessage);
+      console.log("Form submitted. Details:\n", formattedMessage);
     });
   }
 
-  // Quick Action Buttons click logs or custom alerts
+  // Sticky actions click-scrolling
   const quickEnquiry = document.querySelector('.float-enquiry');
   if (quickEnquiry) {
     quickEnquiry.addEventListener('click', () => {
-      // Smooth scroll to the contact/enquiry section
-      const contactSection = document.getElementById('contact-section');
+      const contactSection = document.getElementById('contact');
       if (contactSection) {
         contactSection.scrollIntoView({ behavior: 'smooth' });
-      } else {
-        window.location.href = 'contact.html';
       }
     });
   }
 
-  // Dynamic WhatsApp Float Button link based on context
+  // Float WhatsApp setup
   const whatsappFloat = document.querySelector('.float-whatsapp');
   if (whatsappFloat) {
-    let presetText = "Hi RK Ventures, I'm visiting your website and would like to enquire about your services.";
-    if (pageName === 'energy.html') {
-      presetText = "Hi RK Ventures, I'm interested in PURE Power Energy Storage systems and battery technology.";
-    } else if (pageName === 'construction.html') {
-      presetText = "Hi RK Ventures, I'm interested in your Construction and Interior Designing services.";
-    }
+    const presetText = "Hi RK Ventures, I'm visiting your website and would like to enquire about your BESS batteries and Construction services.";
     whatsappFloat.setAttribute('href', `https://wa.me/919876543210?text=${encodeURIComponent(presetText)}`);
     whatsappFloat.setAttribute('target', '_blank');
   }
+
+  // FAQ Accordion toggles
+  const faqQuestions = document.querySelectorAll('.faq-question');
+  faqQuestions.forEach(q => {
+    q.addEventListener('click', () => {
+      const item = q.parentElement;
+      const isActive = item.classList.contains('active');
+      
+      // Close other FAQs
+      document.querySelectorAll('.faq-item').forEach(el => el.classList.remove('active'));
+      
+      if (!isActive) {
+        item.classList.add('active');
+      }
+    });
+  });
 
 });
