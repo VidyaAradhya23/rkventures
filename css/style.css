@@ -557,6 +557,124 @@ ul {
 }
 
 /* ==========================================
+   SUBPAGE HERO STYLES (BRIGHT THEME)
+   ========================================== */
+.hero-energy,
+.hero-construction,
+.hero-about,
+.hero-contact {
+  position: relative;
+  padding: 160px 0 100px 0;
+  overflow: hidden;
+}
+
+.hero-energy {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(255, 255, 255, 1) 70%),
+              radial-gradient(circle at 10% 20%, rgba(37, 99, 235, 0.05) 0%, transparent 40%);
+  border-bottom: 1px solid rgba(37, 99, 235, 0.08);
+}
+
+.hero-construction {
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.05) 0%, rgba(255, 255, 255, 1) 70%),
+              radial-gradient(circle at 90% 10%, rgba(249, 115, 22, 0.05) 0%, transparent 40%);
+  border-bottom: 1px solid rgba(249, 115, 22, 0.08);
+}
+
+.hero-about {
+  background: linear-gradient(135deg, rgba(15, 23, 26, 0.03) 0%, rgba(255, 255, 255, 1) 70%),
+              radial-gradient(circle at 50% 10%, rgba(15, 23, 26, 0.03) 0%, transparent 50%);
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.hero-contact {
+  background: linear-gradient(135deg, rgba(15, 23, 26, 0.03) 0%, rgba(255, 255, 255, 1) 70%),
+              radial-gradient(circle at 50% 10%, rgba(15, 23, 26, 0.03) 0%, transparent 50%);
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.hero-energy::before,
+.hero-construction::before,
+.hero-about::before,
+.hero-contact::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 0.3;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.hero-energy::before {
+  background-image: linear-gradient(rgba(37, 99, 235, 0.03) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(37, 99, 235, 0.03) 1px, transparent 1px);
+  background-size: 30px 30px;
+}
+
+.hero-construction::before {
+  background-image: linear-gradient(rgba(249, 115, 22, 0.03) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(249, 115, 22, 0.03) 1px, transparent 1px);
+  background-size: 30px 30px;
+}
+
+.hero-about::before,
+.hero-contact::before {
+  background-image: linear-gradient(rgba(71, 85, 105, 0.02) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(71, 85, 105, 0.02) 1px, transparent 1px);
+  background-size: 30px 30px;
+}
+
+.hero-corp-content {
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
+}
+
+.hero-corp-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 3.5rem;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -1.5px;
+  color: var(--text-primary);
+  margin-top: 15px;
+  margin-bottom: 20px;
+}
+
+.hero-corp-desc {
+  font-size: 1.15rem;
+  color: var(--text-secondary);
+  max-width: 650px;
+  margin-bottom: 35px;
+  line-height: 1.6;
+}
+
+.hero-corp-actions {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .hero-energy,
+  .hero-construction,
+  .hero-about,
+  .hero-contact {
+    padding: 130px 0 70px 0;
+  }
+  
+  .hero-corp-title {
+    font-size: 2.6rem;
+  }
+  
+  .hero-corp-desc {
+    font-size: 1.05rem;
+  }
+}
+
+/* ==========================================
    ABOUT US SECTION
    ========================================== */
 .about-grid {

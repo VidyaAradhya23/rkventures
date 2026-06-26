@@ -195,7 +195,28 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   const sections = document.querySelectorAll('section[id]');
+  const path = window.location.pathname;
+  const page = path.split("/").pop();
+  
+  // Set initial active state based on filename
+  let isSubpage = false;
+  const subpageFilenames = ['energy.html', 'construction.html', 'about.html', 'contact.html'];
+  
+  if (page && subpageFilenames.includes(page)) {
+    isSubpage = true;
+    navLinks.forEach(link => {
+      const href = link.getAttribute('href');
+      if (href && href.includes(page)) {
+        link.classList.add('active');
+      } else {
+        link.classList.remove('active');
+      }
+    });
+  }
+
   window.addEventListener('scroll', () => {
+    if (isSubpage) return;
+
     let current = '';
     const scrollPos = window.scrollY + 100;
 
@@ -213,7 +234,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (hrefAttr.includes(current) && current !== '') {
         link.classList.add('active');
       }
-      if (window.scrollY < 200 && hrefAttr === '#home') {
+      if (window.scrollY < 200 && (hrefAttr === '#home' || hrefAttr === 'index.html' || hrefAttr.includes('#home'))) {
         link.classList.add('active');
       }
     });
